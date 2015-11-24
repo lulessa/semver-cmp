@@ -1,0 +1,23 @@
+{
+  "name": "semver-cmp",
+  "version": "0.2.0",
+  "description": "Compare Semantic Versioning strings in major.minor.patch-pre.release format per Semantic Versioning 2.0.0 spec.",
+  "main": "semver-cmp.js",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "mocha": "^2.3.4",
+    "chai": "^3.4.1"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "semver",
+    "semantic",
+    "versioning",
+    "compare"
+  ],
+  "author": "Lucas Lessa",
+  "license": "ISC"
+}
