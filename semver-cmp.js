@@ -31,6 +31,9 @@
             return (a[i] > b[i] ? 1 : -1);
           }
         }
+        if (a[3] || b[3]) {
+          return (b[3] && !a[3] ? 1 : -1);
+        }
         return 0;
       },
       lt: function(versionA, versionB) {

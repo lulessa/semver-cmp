@@ -13,6 +13,8 @@ module.exports = do ->
     b = @split versionB
     for i in [0...3] when a[i] isnt b[i]
       return (if a[i] > b[i] then 1 else -1)
+    # Pre-release versions have a lower precedence than the associated normal version.
+    return (if b[3] and not a[3] then 1 else -1) if a[3] or b[3]
     return 0
 
   lt: (versionA, versionB) ->

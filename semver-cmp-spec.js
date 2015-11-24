@@ -104,10 +104,14 @@
         expect(semverCheck.cmp("1.4.1", "1.2.3")).to.equal(1);
         return expect(semverCheck.cmp("1.10.1", "1.2.3")).to.equal(1);
       });
-      return it("returns integer -1 when version a is lower than b", function() {
+      it("returns integer -1 when version a is lower than b", function() {
         expect(semverCheck.cmp("1.2.3", "1.7.1")).to.equal(-1);
         expect(semverCheck.cmp("1.2.3", "1.11.1")).to.equal(-1);
         return expect(semverCheck.cmp("1.10.3", "1.11.1")).to.equal(-1);
+      });
+      return it("gives pre-release version a lower precendence than associated normal version", function() {
+        expect(semverCheck.cmp("1.2.3-beta", "1.2.3")).to.equal(-1);
+        return expect(semverCheck.cmp("1.2.3-0.4.5", "1.2.3")).to.equal(-1);
       });
     });
   });
