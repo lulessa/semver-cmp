@@ -9,15 +9,15 @@ module.exports = do ->
     result[3] = extras.join(".") if extras.length
     result
 
-  compare: (a, b, comparison) ->
-    a = @split a
-    b = @split b
-    return comparison a[0], b[0] if a[0] isnt b[0]
-    return comparison a[1], b[1] if a[1] isnt b[1]
-    return comparison a[2], b[2]
+  cmp: (versionA, versionB) ->
+    a = @split versionA
+    b = @split versionB
+    for i in [0...3] when a[i] isnt b[i]
+      return (if a[i] > b[i] then 1 else -1)
+    return 0
 
   lt: (versionA, versionB) ->
-    @compare versionA, versionB, (a, b) -> a < b
+    0 > @cmp versionA, versionB
 
   gte: (versionA, versionB) ->
-    @compare versionA, versionB, (a, b) -> a >= b
+    0 <= @cmp versionA, versionB
