@@ -3,23 +3,22 @@
   module.exports = (function() {
     return {
       split: function(version) {
-        var extras, i, ref, result, segments;
+        var i, ref, release, result, segments;
         if ((ref = typeof version) !== "string" && ref !== "number") {
           throw new TypeError("version must be string or number");
         }
-        version = version.toString();
-        segments = version.split(".");
+        segments = version.toString().split("-");
+        release = segments[0].split(".");
         result = (function() {
           var j, results;
           results = [];
           for (i = j = 0; j < 3; i = ++j) {
-            results.push(+segments[i] || 0);
+            results.push(+release[i] || 0);
           }
           return results;
         })();
-        extras = segments.slice(3);
-        if (extras.length) {
-          result[3] = extras.join(".");
+        if (segments[1]) {
+          result[3] = segments[1];
         }
         return result;
       },

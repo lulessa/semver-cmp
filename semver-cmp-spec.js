@@ -16,9 +16,10 @@
         expect(semverCheck.split("1")).to.deep.equal([1, 0, 0]);
         return expect(semverCheck.split("1.n")).to.deep.equal([1, 0, 0]);
       });
-      it("passes extra versioning thru as string", function() {
-        expect(semverCheck.split("1.2.3.4567")).to.deep.equal([1, 2, 3, "4567"]);
-        return expect(semverCheck.split("1.2.3.4567.89")).to.deep.equal([1, 2, 3, "4567.89"]);
+      it("passes pre-release version thru as string", function() {
+        expect(semverCheck.split("1.2.3-4567")).to.deep.equal([1, 2, 3, "4567"]);
+        expect(semverCheck.split("1.2.3-4567.89")).to.deep.equal([1, 2, 3, "4567.89"]);
+        return expect(semverCheck.split("1.2.3-alpha.89")).to.deep.equal([1, 2, 3, "alpha.89"]);
       });
       it("converts float or integer input to string", function() {
         expect(semverCheck.split(1.2)).to.deep.equal([1, 2, 0]);
