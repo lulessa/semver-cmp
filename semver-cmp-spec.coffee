@@ -99,3 +99,58 @@ describe "semver-cmp", ->
       expect(semverCmp.cmp("1.2.3-beta", "1.2.3")).to.equal(-1)
       expect(semverCmp.cmp("1.2.3-0.4.5", "1.2.3")).to.equal(-1)
 
+    it "compares pre-release versions when normal versions equal", ->
+      expect(semverCmp.cmp("1.0.0", "1.0.0")).to.equal(0)
+      expect(semverCmp.cmp("1.0.0-alpha", "1.0.0-alpha.1")).to.equal(-1)
+      expect(semverCmp.cmp("1.0.0-alpha.1", "1.0.0-alpha.beta")).to.equal(-1)
+      expect(semverCmp.cmp("1.0.0-beta", "1.0.0-beta.2")).to.equal(-1)
+      expect(semverCmp.cmp("1.0.0-beta.2", "1.0.0-beta.11")).to.equal(-1)
+      expect(semverCmp.cmp("1.0.0-beta.11", "1.0.0-rc.1")).to.equal(-1)
+      expect(semverCmp.cmp("1.0.0-rc.1", "1.0.0-beta.11")).to.equal(1)
+
+  context "#cmppre", ->
+    it "returns 0 when both parameters are undefined", ->
+      expect(semverCmp.cmppre(undefined, undefined)).to.equal(0)
+
+    it "returns 0 when both parameters are equal", ->
+      expect(semverCmp.cmppre("beta.1.2.alpha", "beta.1.2.alpha")).to.equal(0)
+
+    it "gives pre-release version a lower precendence than undefined pre-release", ->
+      expect(semverCmp.cmppre("beta", undefined)).to.equal(-1)
+      expect(semverCmp.cmppre("0.4.5", undefined)).to.equal(-1)
+      expect(semverCmp.cmppre(undefined, "beta")).to.equal(1)
+
+    it "ignores plus sign and metadata after it", ->
+      expect(semverCmp.cmppre("alpha+001", "alpha+007")).to.equal(0)
+      expect(semverCmp.cmppre("alpha+001", "beta+007")).to.equal(-1)
+
+    it "compares each dot separated identifier from left to right until a
+        difference is found", ->
+      expect(semverCmp.cmppre("x.7.z.92", "x.7.z.91")).to.equal(1)
+      expect(semverCmp.cmppre("x.7.z.92", "x.7.z.92")).to.equal(0)
+      expect(semverCmp.cmppre("x.7.z.92", "x.8.z.92")).to.equal(-1)
+
+    it "compares identifiers consisting of only digits numerically", ->
+      expect(semverCmp.cmppre("0.11", "0.2")).to.equal(1)
+      expect(semverCmp.cmppre("0.11", "0.13")).to.equal(-1)
+
+    it "compares identifiers containing letters or hyphens lexically in ASCII
+        sort order", ->
+      expect(semverCmp.cmppre("beta", "alpha")).to.equal(1)
+      expect(semverCmp.cmppre("beta", "rc")).to.equal(-1)
+
+    it "gives numeric identifiers lower precedence than non-numeric identifiers", ->
+      expect(semverCmp.cmppre("beta.1", "beta.gamma")).to.equal(-1)
+      expect(semverCmp.cmppre("beta.1", "beta.1x")).to.equal(-1)
+
+    it "gives a larger set of pre-release fields a higher precedence than a
+        smaller set when all of the preceding identifiers are equal", ->
+      expect(semverCmp.cmppre("beta.2", "beta")).to.equal(1)
+      expect(semverCmp.cmppre("beta.2.alpha.4", "beta.2.alpha")).to.equal(1)
+
+    it "runs the gauntlet", ->
+      expect(semverCmp.cmppre("alpha", "alpha.1")).to.equal(-1)
+      expect(semverCmp.cmppre("alpha.1", "alpha.beta")).to.equal(-1)
+      expect(semverCmp.cmppre("beta", "beta.2")).to.equal(-1)
+      expect(semverCmp.cmppre("beta.2", "beta.11")).to.equal(-1)
+      expect(semverCmp.cmppre("beta.11", "rc.1")).to.equal(-1)

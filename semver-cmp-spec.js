@@ -96,7 +96,7 @@
         return expect(semverCheck.gte("1.2.3", "1.2.3")).to.be["true"];
       });
     });
-    return context("#cmp", function() {
+    context("#cmp", function() {
       it("returns integer 0 when version a equals b", function() {
         return expect(semverCheck.cmp("1.2.3", "1.2.3")).to.equal(0);
       });
@@ -109,9 +109,63 @@
         expect(semverCheck.cmp("1.2.3", "1.11.1")).to.equal(-1);
         return expect(semverCheck.cmp("1.10.3", "1.11.1")).to.equal(-1);
       });
-      return it("gives pre-release version a lower precendence than associated normal version", function() {
+      it("gives pre-release version a lower precendence than associated normal version", function() {
         expect(semverCheck.cmp("1.2.3-beta", "1.2.3")).to.equal(-1);
         return expect(semverCheck.cmp("1.2.3-0.4.5", "1.2.3")).to.equal(-1);
+      });
+      return it("compares pre-release versions when normal versions equal", function() {
+        expect(semverCheck.cmp("1.0.0", "1.0.0")).to.equal(0);
+        expect(semverCheck.cmp("1.0.0-alpha", "1.0.0-alpha.1")).to.equal(-1);
+        expect(semverCheck.cmp("1.0.0-alpha.1", "1.0.0-alpha.beta")).to.equal(-1);
+        expect(semverCheck.cmp("1.0.0-beta", "1.0.0-beta.2")).to.equal(-1);
+        expect(semverCheck.cmp("1.0.0-beta.2", "1.0.0-beta.11")).to.equal(-1);
+        expect(semverCheck.cmp("1.0.0-beta.11", "1.0.0-rc.1")).to.equal(-1);
+        return expect(semverCheck.cmp("1.0.0-rc.1", "1.0.0-beta.11")).to.equal(1);
+      });
+    });
+    return context("#cmppre", function() {
+      it("returns 0 when both parameters are undefined", function() {
+        return expect(semverCheck.cmppre(void 0, void 0)).to.equal(0);
+      });
+      it("returns 0 when both parameters are equal", function() {
+        return expect(semverCheck.cmppre("beta.1.2.alpha", "beta.1.2.alpha")).to.equal(0);
+      });
+      it("gives pre-release version a lower precendence than undefined pre-release", function() {
+        expect(semverCheck.cmppre("beta", void 0)).to.equal(-1);
+        expect(semverCheck.cmppre("0.4.5", void 0)).to.equal(-1);
+        return expect(semverCheck.cmppre(void 0, "beta")).to.equal(1);
+      });
+      it("ignores plus sign and metadata after it", function() {
+        expect(semverCheck.cmppre("alpha+001", "alpha+007")).to.equal(0);
+        return expect(semverCheck.cmppre("alpha+001", "beta+007")).to.equal(-1);
+      });
+      it("compares each dot separated identifier from left to right until a difference is found", function() {
+        expect(semverCheck.cmppre("x.7.z.92", "x.7.z.91")).to.equal(1);
+        expect(semverCheck.cmppre("x.7.z.92", "x.7.z.92")).to.equal(0);
+        return expect(semverCheck.cmppre("x.7.z.92", "x.8.z.92")).to.equal(-1);
+      });
+      it("compares identifiers consisting of only digits numerically", function() {
+        expect(semverCheck.cmppre("0.11", "0.2")).to.equal(1);
+        return expect(semverCheck.cmppre("0.11", "0.13")).to.equal(-1);
+      });
+      it("compares identifiers containing letters or hyphens lexically in ASCII sort order", function() {
+        expect(semverCheck.cmppre("beta", "alpha")).to.equal(1);
+        return expect(semverCheck.cmppre("beta", "rc")).to.equal(-1);
+      });
+      it("gives numeric identifiers lower precedence than non-numeric identifiers", function() {
+        expect(semverCheck.cmppre("beta.1", "beta.gamma")).to.equal(-1);
+        return expect(semverCheck.cmppre("beta.1", "beta.1x")).to.equal(-1);
+      });
+      it("gives a larger set of pre-release fields a higher precedence than a smaller set when all of the preceding identifiers are equal", function() {
+        expect(semverCheck.cmppre("beta.2", "beta")).to.equal(1);
+        return expect(semverCheck.cmppre("beta.2.alpha.4", "beta.2.alpha")).to.equal(1);
+      });
+      return it("runs the gauntlet", function() {
+        expect(semverCheck.cmppre("alpha", "alpha.1")).to.equal(-1);
+        expect(semverCheck.cmppre("alpha.1", "alpha.beta")).to.equal(-1);
+        expect(semverCheck.cmppre("beta", "beta.2")).to.equal(-1);
+        expect(semverCheck.cmppre("beta.2", "beta.11")).to.equal(-1);
+        return expect(semverCheck.cmppre("beta.11", "rc.1")).to.equal(-1);
       });
     });
   });

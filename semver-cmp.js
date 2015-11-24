@@ -31,8 +31,42 @@
             return (a[i] > b[i] ? 1 : -1);
           }
         }
-        if (a[3] || b[3]) {
-          return (b[3] && !a[3] ? 1 : -1);
+        return this.cmppre(a[3], b[3]);
+      },
+      cmppre: function(a, b) {
+        var i, idA, idB, identifier, j, k, pre, ref, stripMeta;
+        if (!(a && b)) {
+          return (a || b ? (b && !a ? 1 : -1) : 0);
+        }
+        stripMeta = function(pre) {
+          return pre.toString().split("+")[0];
+        };
+        ref = (function() {
+          var j, len, ref, results;
+          ref = [a, b];
+          results = [];
+          for (j = 0, len = ref.length; j < len; j++) {
+            pre = ref[j];
+            results.push(stripMeta(pre).split("."));
+          }
+          return results;
+        })(), a = ref[0], b = ref[1];
+        identifier = function(id) {
+          var exists;
+          exists = id != null;
+          exists && +id && (id = +id);
+          return [id, exists];
+        };
+        i = 0;
+        while ((a[i] != null) || (b[i] != null)) {
+          idA = identifier(a[i]);
+          idB = identifier(b[i]);
+          for (k = j = 1; j >= 0; k = --j) {
+            if (idA[k] !== idB[k]) {
+              return (idA[k] > idB[k] ? 1 : -1);
+            }
+          }
+          i++;
         }
         return 0;
       },

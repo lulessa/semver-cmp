@@ -13,8 +13,26 @@ module.exports = do ->
     b = @split versionB
     for i in [0...3] when a[i] isnt b[i]
       return (if a[i] > b[i] then 1 else -1)
-    # Pre-release versions have a lower precedence than the associated normal version.
-    return (if b[3] and not a[3] then 1 else -1) if a[3] or b[3]
+    return @cmppre a[3], b[3]
+
+  cmppre: (a, b) ->
+    unless a and b
+    # Pre-release versions have a lower precedence than the associated normal version
+      return (if a or b then (if b and not a then 1 else -1) else 0)
+    stripMeta = (pre) -> pre.toString().split("+")[0]
+    [ a, b ] = (stripMeta(pre).split(".") for pre in [ a, b ])
+    identifier = (id) ->
+      exists = id?
+      exists && +id && id = +id
+      [ id, exists ]
+    i = 0
+    while a[i]? or b[i]?
+      idA = identifier a[i]
+      idB = identifier b[i]
+      # Compares exists first, then proper id
+      for k in [1..0] when idA[k] isnt idB[k]
+        return (if idA[k] > idB[k] then 1 else -1)
+      i++
     return 0
 
   lt: (versionA, versionB) ->
