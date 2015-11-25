@@ -1,7 +1,7 @@
 describe "semver-cmp", ->
   expect = require("chai").expect
 
-  semverCmp = require("./semver-cmp")
+  semverCmp = require("../semver-cmp")
 
   context "#split", ->
     it "returns array with major, minor, patch version integers", ->
@@ -16,11 +16,12 @@ describe "semver-cmp", ->
       expect(semverCmp.split("1.n")).to.deep.equal([ 1, 0, 0])
 
     it "passes extra versioning thru as string", ->
-      expect(semverCmp.split("1.2.3.4567")).to.deep.equal([ 1, 2, 3, "4567" ])
-      expect(semverCmp.split("1.2.3.4567.89")).to.deep.equal([ 1, 2, 3, "4567.89" ])
+      expect(semverCmp.split("1.2.3-4567")).to.deep.equal([ 1, 2, 3, "4567" ])
+      expect(semverCmp.split("1.2.3-4567.89")).to.deep.equal([ 1, 2, 3, "4567.89" ])
 
     it "converts float or integer input to string", ->
       expect(semverCmp.split(1.2)).to.deep.equal([ 1, 2, 0 ])
+      expect(semverCmp.split(1.12)).to.deep.equal([ 1, 12, 0 ])
       expect(semverCmp.split(2)).to.deep.equal([ 2, 0, 0 ])
 
     it "throws if input cannot be converted to string", ->
